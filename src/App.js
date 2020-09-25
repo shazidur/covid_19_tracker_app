@@ -3,14 +3,27 @@ import { MenuItem, FormControl, Select, Card } from "@material-ui/core";
 
 import InfoBox from "./InfoBox";
 import Map from "./Map";
+import Table from "./Table";
+import LineGraph from "./LineGraph";
+import { sortData } from "./util";
 import "./App.css";
 
 function App() {
   const [countries, setCountries] = useState([]);
-  const [country, setCountry] = useState("Worldwide");
+  const [country, setCountry] = useState("worldwide");
+  const [countryInfo, setCountryInfo] = useState({});
+  const [tableData, setTableData] = useState([]);
 
   useEffect(() => {
-    console.log("use effect");
+    fetch("https://disease.sh/v3/covid-19/all")
+      .then((response) => response.json())
+      .then((data) => {
+        setCountryInfo(data);
+      });
+  }, []);
+
+  useEffect(() => {
+    // console.log("use effect000000000", country);
     const getCountryData = async () => {
       await fetch("https://disease.sh/v3/covid-19/countries")
         .then((response) => response.json())
@@ -20,17 +33,28 @@ function App() {
             value: country.countryInfo.iso2,
           }));
           setCountries(countries);
+          const sortedData = sortData(data);
+          setTableData(sortedData);
         });
     };
     getCountryData();
   }, []);
 
-  console.log("-----State", countries);
-
   const onCountryChange = async (event) => {
     const countryCode = event.target.value;
     console.log(countryCode);
     setCountry(countryCode);
+
+    const url =
+      countryCode === "worldwide"
+        ? "https://disease.sh/v3/covid-19/all"
+        : `https://disease.sh/v3/covid-19/countries/${countryCode}`;
+
+    await fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        setCountryInfo(data);
+      });
   };
 
   return (
@@ -44,8 +68,7 @@ function App() {
               value={country}
               onClick={onCountryChange}
             >
-              <MenuItem value={"Worldwide"}> Worldwide </MenuItem>
-
+              <MenuItem value={"worldwide"}> Worldwide </MenuItem>
               {countries.map((country) => (
                 <MenuItem value={country.value}> {country.name} </MenuItem>
               ))}
@@ -56,17 +79,27 @@ function App() {
         <div className="app__status">
           <InfoBox
             title="Coronavirus cases"
-            cases={23333}
-            total={200}
+            cases={countryInfo.todayCases}
+            total={countryInfo.cases}
           ></InfoBox>
-          <InfoBox title="Recoverd" cases={3323} total={400}></InfoBox>
-          <InfoBox title="Deaths" cases={20} total={30}></InfoBox>
+          <InfoBox
+            title="Recoverd"
+            cases={countryInfo.todayRecovered}
+            total={countryInfo.recovered}
+          ></InfoBox>
+          <InfoBox
+            title="Deaths"
+            cases={countryInfo.todayDeaths}
+            total={countryInfo.deaths}
+          ></InfoBox>
         </div>
         <Map />
       </div>
       <Card className="app__right">
         <h3> Live cases by country </h3>
+        <Table countries={tableData} />
         <h3> Worldwide new cases </h3>
+        <LineGraph />
       </Card>
     </div>
   );
