@@ -4,24 +4,26 @@ import { Circle, Popup } from "react-leaflet";
 
 const casesTypeColors = {
   cases: {
-    hex: "#CC1034",
+    hex: "#EF5B25",
     multiplier: 800,
   },
   recovered: {
-    hex: "#7dd71d",
+    hex: "#178a15",
     multiplier: 1200,
   },
   deaths: {
-    hex: "#fb4443",
+    hex: "#000000",
     multiplier: 2000,
   },
 };
 
 export const sortData = (data) => {
   const sortData = [...data];
-
   return sortData.sort((a, b) => (a.cases > b.cases ? -1 : 1));
 };
+
+export const prettyPrintStat = (stat) =>
+  stat ? `+${numeral(stat).format("0.0a")}` : "+0";
 
 export const showDataForMap = (data, casesType = "cases") =>
   data.map((country) => (

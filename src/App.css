@@ -6,16 +6,35 @@ body {
   background-color: #f5f6fa;
 }
 
+.app__dropdown {
+  background-color: white;
+}
+
+.app__header > h1 {
+  color: #fc3c3c;
+  font-size: 2rem;
+}
+
 .app {
   display: flex;
   justify-content: space-evenly;
   padding: 20px;
+  background-color: #f5f6fa;
+  /* flex-direction: column; */
 }
 .app__header {
   display: flex;
-  align-items: center;
+  align-items: left;
   justify-content: space-between;
   margin-bottom: 20px;
+}
+
+.app__leftHeafer {
+  display: flex;
+}
+
+.app__logo {
+  height: 50px;
 }
 
 .app__left {
@@ -26,13 +45,21 @@ body {
   padding: 10px;
 }
 
+.app__information > h3:last-of-type {
+  margin-top: 1rem;
+}
+
 .app__status {
   display: flex;
   justify-content: space-between;
 }
 
 @media (max-width: 800px) {
-  .app {
+  .app__contailer {
     flex-direction: column;
   }
+}
+
+.info {
+  display: flex;
 }
