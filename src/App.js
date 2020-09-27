@@ -5,9 +5,11 @@ import InfoBox from "./InfoBox";
 import Map from "./Map";
 import Table from "./Table";
 import LineGraph from "./LineGraph";
-import { sortData } from "./util";
+import AppInfo from "./AppInfo";
+import { sortData, prettyPrintStat } from "./util";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
+import Logo from "./logo.png";
 
 function App() {
   const [countries, setCountries] = useState([]);
@@ -17,6 +19,7 @@ function App() {
   const [mapCenter, setMapCenter] = useState({ lat: 34.80746, lng: -40.4796 });
   const [mapZoom, setMapZoom] = useState(3);
   const [mapCountries, setMapCountries] = useState([]);
+  const [casesType, setCasesType] = useState("cases");
 
   useEffect(() => {
     fetch("https://disease.sh/v3/covid-19/all")
@@ -27,7 +30,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // console.log("use effect000000000", country);
     const getCountryData = async () => {
       await fetch("https://disease.sh/v3/covid-19/countries")
         .then((response) => response.json())
@@ -46,7 +48,7 @@ function App() {
   }, []);
 
   const onCountryChange = async (event) => {
-    const countryCode = event.target.value;
+    const countryCode = event.target ? event.target.value : event;
     console.log(countryCode);
     setCountry(countryCode);
 
@@ -60,7 +62,7 @@ function App() {
       .then((data) => {
         setCountryInfo(data);
         setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
-        setMapZoom(4);
+        setMapZoom();
       });
   };
 
@@ -68,7 +70,10 @@ function App() {
     <div className="app">
       <div className="app__left">
         <div className="app__header">
-          <h1> Covid-19 Tracker </h1>
+          <div className={"app__leftHeafer"}>
+            <img className={"app__logo"} src={Logo} />
+            <h1> Covid-19 Tracker </h1>
+          </div>
           <FormControl className="app__dropdown">
             <Select
               variant="outlined"
@@ -85,28 +90,46 @@ function App() {
 
         <div className="app__status">
           <InfoBox
+            isRed
+            onClick={(e) => setCasesType("cases")}
+            active={casesType === "cases"}
             title="Coronavirus cases"
-            cases={countryInfo.todayCases}
+            cases={prettyPrintStat(countryInfo.todayCases)}
             total={countryInfo.cases}
           ></InfoBox>
           <InfoBox
+            isGreen
+            onClick={(e) => setCasesType("recovered")}
+            active={casesType === "recovered"}
             title="Recoverd"
-            cases={countryInfo.todayRecovered}
+            cases={prettyPrintStat(countryInfo.todayRecovered)}
             total={countryInfo.recovered}
           ></InfoBox>
           <InfoBox
+            isDark
+            onClick={(e) => setCasesType("deaths")}
+            active={casesType === "deaths"}
             title="Deaths"
-            cases={countryInfo.todayDeaths}
+            cases={prettyPrintStat(countryInfo.todayDeaths)}
             total={countryInfo.deaths}
           ></InfoBox>
         </div>
-        <Map countries={mapCountries} center={mapCenter} zoom={mapZoom} />
+        <Map
+          countries={mapCountries}
+          casesType={casesType}
+          center={mapCenter}
+          zoom={mapZoom}
+        />
       </div>
       <Card className="app__right">
         <h3> Live cases by country </h3>
-        <Table countries={tableData} />
-        <h3> Worldwide new cases </h3>
-        <LineGraph />
+        <Table countries={tableData} onCountry={onCountryChange} />
+        <br />
+        <h3> Worldwide new {casesType} </h3>
+        <br />
+        <LineGraph casesType={casesType} />
+        <br />
+        {/* <AppInfo /> */}
       </Card>
     </div>
   );

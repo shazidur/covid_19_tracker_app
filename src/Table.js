@@ -1,12 +1,12 @@
 import React from "react";
 import "./Table.css";
 
-function Table({ countries }) {
-  //   console.log("this is from table", countries);
+function Table(props) {
   return (
     <div className="table">
-      {countries.map(({ country, cases }) => (
-        <tr>
+      {props.countries.map(({ country, cases, countryInfo }) => (
+        <tr onClick={() => props.onCountry(countryInfo.iso2)}>
+          <td> {<img className={"table__img"} src={countryInfo.flag} />} </td>
           <td> {country} </td>
           <td>
             <strong>{cases} </strong>

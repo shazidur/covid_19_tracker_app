@@ -74,7 +74,7 @@ function LineGraph({ casesType }) {
         .then((data) => {
           //some work
           console.log("data - > ", data);
-          const chartData = buildChartData(data);
+          const chartData = buildChartData(data, casesType);
           setData(chartData);
         });
     };
@@ -83,14 +83,13 @@ function LineGraph({ casesType }) {
 
   return (
     <div>
-      <p> This is Line graph... </p>
       {data?.length > 0 && (
         <Line
           data={{
             datasets: [
               {
-                backgroundColor: "rgba(204, 16, 52, 0.5)",
-                borderColor: "#CC1034",
+                backgroundColor: "#bdbdbd",
+                borderColor: "#616161",
                 data: data,
               },
             ],
